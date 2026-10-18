@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
@@ -21,9 +22,9 @@ class AnasPortfolioApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
         useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFF07111F),
+        scaffoldBackgroundColor: const Color(0xFF080B1A),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00B8FF),
+          seedColor: const Color(0xFF8B5CF6),
           brightness: Brightness.dark,
         ),
         fontFamily: 'Arial',
@@ -191,56 +192,55 @@ class _PortfolioShellState extends State<PortfolioShell>
   // ==========================================================
 
   Widget _buildTopBar() {
-    return Container(
-      height: 68,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      decoration: BoxDecoration(
-        color: const Color(0xFF07111F).withValues(alpha: 0.94),
-        border: const Border(
-          bottom: BorderSide(
-            color: Color(0x2239D9FF),
-          ),
+    return LayoutBuilder(builder: (context, constraints) {
+      final desktop = constraints.maxWidth >= 1050;
+      return Container(
+        height: 76,
+        padding: EdgeInsets.symmetric(horizontal: desktop ? 38 : 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF080B1A).withValues(alpha: 0.95),
+          border: const Border(bottom: BorderSide(color: Color(0x338B5CF6))),
         ),
-      ),
-      child: Row(
-        children: [
-          Builder(
-            builder: (context) {
-              return IconButton(
-                tooltip: 'Menu',
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                icon: const Icon(
-                  Icons.menu_rounded,
-                  size: 27,
-                  color: Color(0xFF00C8FF),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 5),
-          const Text(
-            '<AK/>',
-            style: TextStyle(
-              color: Color(0xFF00C8FF),
-              fontSize: 22,
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            _navItems[_selectedIndex].toUpperCase(),
-            style: const TextStyle(
-              color: Colors.white54,
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1.5,
-            ),
-          ),
-        ],
-      ),
-    );
+        child: Row(children: [
+          if (!desktop)
+            Builder(builder: (context) => IconButton(
+              tooltip: 'Menu',
+              onPressed: () => Scaffold.of(context).openDrawer(),
+              icon: const Icon(Icons.menu_rounded, color: Color(0xFFB99AFF)),
+            )),
+          const Text('<AK/>', style: TextStyle(
+            color: Color(0xFFB99AFF), fontSize: 24, fontWeight: FontWeight.w900,
+          )),
+          if (desktop) ...[
+            const SizedBox(width: 34),
+            Expanded(child: Row(mainAxisAlignment: MainAxisAlignment.end,
+              children: List.generate(_navItems.length, (index) {
+                final selected = index == _selectedIndex;
+                return Flexible(child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 2),
+                  child: TextButton(
+                    onPressed: () => _openPage(index),
+                    style: TextButton.styleFrom(
+                      foregroundColor: selected ? const Color(0xFFB99AFF) : Colors.white70,
+                      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 12),
+                    ),
+                    child: FittedBox(fit: BoxFit.scaleDown,
+                      child: Text(_navItems[index], style: TextStyle(
+                        fontSize: 13, fontWeight: selected ? FontWeight.w800 : FontWeight.w500,
+                      )),
+                    ),
+                  ),
+                ));
+              }),
+            )),
+          ] else ...[
+            const Spacer(),
+            Text(_navItems[_selectedIndex].toUpperCase(),
+                style: const TextStyle(color: Colors.white60, letterSpacing: 1.4, fontSize: 11)),
+          ],
+        ]),
+      );
+    });
   }
 
   // ==========================================================
@@ -249,7 +249,7 @@ class _PortfolioShellState extends State<PortfolioShell>
 
   Widget _buildDrawer() {
     return Drawer(
-      backgroundColor: const Color(0xFF0A1728),
+      backgroundColor: const Color(0xFF111126),
       child: SafeArea(
         child: Column(
           children: [
@@ -263,13 +263,13 @@ class _PortfolioShellState extends State<PortfolioShell>
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF00C8FF),
-                    Color(0xFF1769FF),
+                    Color(0xFFB99AFF),
+                    Color(0xFF5B36D1),
                   ],
                 ),
               ),
               child: const CircleAvatar(
-                backgroundColor: Color(0xFF07111F),
+                backgroundColor: Color(0xFF080B1A),
                 backgroundImage: AssetImage(
                   'assets/profile.png',
                 ),
@@ -323,14 +323,14 @@ class _PortfolioShellState extends State<PortfolioShell>
                       leading: Icon(
                         _navIcons[index],
                         color: selected
-                            ? const Color(0xFF00C8FF)
+                            ? const Color(0xFFB99AFF)
                             : Colors.white54,
                       ),
                       title: Text(
                         _navItems[index],
                         style: TextStyle(
                           color: selected
-                              ? const Color(0xFF00C8FF)
+                              ? const Color(0xFFB99AFF)
                               : Colors.white,
                           fontWeight: selected
                               ? FontWeight.w700
@@ -341,12 +341,12 @@ class _PortfolioShellState extends State<PortfolioShell>
                           ? const Icon(
                         Icons.arrow_forward_ios_rounded,
                         size: 13,
-                        color: Color(0xFF00C8FF),
+                        color: Color(0xFFB99AFF),
                       )
                           : null,
                       selected: selected,
                       selectedTileColor:
-                      const Color(0xFF00C8FF).withValues(alpha: 0.08),
+                      const Color(0xFFB99AFF).withValues(alpha: 0.08),
                       onTap: () => _selectPage(index),
                     ),
                   );
@@ -472,13 +472,14 @@ class _HomePageState extends State<HomePage>
       context,
       MaterialPageRoute(
         builder: (context) => Scaffold(
-          backgroundColor: const Color(0xFF07111F),
+          backgroundColor: const Color(0xFF080B1A),
           appBar: AppBar(
             title: const Text('My Projects'),
-            backgroundColor: const Color(0xFF07111F),
+            backgroundColor: const Color(0xFF080B1A),
             foregroundColor: Colors.white,
             elevation: 0,
           ),
+
           body: const ProjectsPage(),
         ),
       ),
@@ -511,50 +512,17 @@ class _HomePageState extends State<HomePage>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        _buildProfileImage(isWide),
-
-                        const SizedBox(height: 20),
-
-                        const Text(
-                          'ANAS KHABEER',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 3,
-                            height: 1.1,
-                          ),
-                        ),
-
-                        const SizedBox(height: 17),
-
-                        // EXACT LINKEDIN HEADLINE
-                        ConstrainedBox(
-                          constraints: const BoxConstraints(
-                            maxWidth: 680,
-                          ),
-                          child: const Text(
-                            'Software Engineering Student @ UMT | '
-                                'Software Quality Engineering & Mobile App Development | '
-                                'Flutter | C++ | QA & Testing',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: Color(0xFF00C8FF),
-                              fontSize: 15.5,
-                              height: 1.65,
-                              fontWeight: FontWeight.w600,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        _buildRoles(),
-
-                        const SizedBox(height: 25),
-
-                        _buildMainButtons(isWide),
+                        if (isWide)
+                          Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                            Expanded(flex: 6, child: _heroIntroduction(false)),
+                            const SizedBox(width: 44),
+                            Expanded(flex: 4, child: _buildProfileImage(true)),
+                          ])
+                        else ...[
+                          _buildProfileImage(false),
+                          const SizedBox(height: 22),
+                          _heroIntroduction(true),
+                        ],
 
                         const SizedBox(height: 28),
 
@@ -617,8 +585,33 @@ class _HomePageState extends State<HomePage>
     );
   }
 
+  Widget _heroIntroduction(bool centered) {
+    return Column(
+      crossAxisAlignment: centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      children: [
+        const Text('HELLO, I AM', style: TextStyle(
+          color: Color(0xFFB99AFF), fontSize: 15, fontWeight: FontWeight.w800,
+          letterSpacing: 3,
+        )),
+        const SizedBox(height: 13),
+        Text('ANAS\nKHABEER', textAlign: centered ? TextAlign.center : TextAlign.left,
+            style: TextStyle(fontSize: centered ? 42 : 64, height: 1.05,
+                fontWeight: FontWeight.w900, letterSpacing: 1.2)),
+        const SizedBox(height: 18),
+        Text('Software Engineering Student @ UMT | Flutter Developer | Software Quality Engineering | C++ | QA & Testing',
+            textAlign: centered ? TextAlign.center : TextAlign.left,
+            style: const TextStyle(color: Color(0xFFB99AFF), fontSize: 16, height: 1.65,
+                fontWeight: FontWeight.w600)),
+        const SizedBox(height: 20),
+        _buildRoles(),
+        const SizedBox(height: 26),
+        _buildMainButtons(!centered),
+      ],
+    );
+  }
+
   Widget _buildProfileImage(bool isWide) {
-    final size = isWide ? 205.0 : 170.0;
+    final size = isWide ? 295.0 : 170.0;
 
     return TweenAnimationBuilder<double>(
       tween: Tween(
@@ -641,8 +634,8 @@ class _HomePageState extends State<HomePage>
           shape: BoxShape.circle,
           gradient: LinearGradient(
             colors: [
-              Color(0xFF00C8FF),
-              Color(0xFF1769FF),
+              Color(0xFFB99AFF),
+              Color(0xFF5B36D1),
             ],
           ),
         ),
@@ -650,7 +643,7 @@ class _HomePageState extends State<HomePage>
           padding: const EdgeInsets.all(5),
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: Color(0xFF07111F),
+            color: Color(0xFF080B1A),
           ),
           child: const CircleAvatar(
             backgroundImage: AssetImage(
@@ -712,7 +705,7 @@ class _HomePageState extends State<HomePage>
             ),
             label: const Text('VIEW PROJECTS'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF00B8FF),
+              backgroundColor: const Color(0xFF8B5CF6),
               foregroundColor: Colors.black,
               elevation: 0,
               padding: const EdgeInsets.symmetric(
@@ -736,7 +729,7 @@ class _HomePageState extends State<HomePage>
             style: OutlinedButton.styleFrom(
               foregroundColor: Colors.white,
               side: const BorderSide(
-                color: Color(0x5500C8FF),
+                color: Color(0x558B5CF6),
               ),
               padding: const EdgeInsets.symmetric(
                 vertical: 15,
@@ -765,15 +758,15 @@ class _HomePageState extends State<HomePage>
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF101D2E),
+              color: const Color(0xFF15152C),
               borderRadius: BorderRadius.circular(15),
               border: Border.all(
-                color: const Color(0x3300C8FF),
+                color: const Color(0x338B5CF6),
               ),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFF00C8FF),
+              color: const Color(0xFFB99AFF),
               size: 21,
             ),
           ),
@@ -814,7 +807,7 @@ class AboutPage extends StatelessWidget {
               children: const [
                 Icon(
                   Icons.person_outline_rounded,
-                  color: Color(0xFF00C8FF),
+                  color: Color(0xFFB99AFF),
                   size: 38,
                 ),
                 SizedBox(height: 18),
@@ -1215,20 +1208,50 @@ class CertificationsPage extends StatelessWidget {
 // RESUME PAGE
 // ============================================================
 
+
 class ResumePage extends StatelessWidget {
   const ResumePage({super.key});
 
+  Future<void> _openResumeInBrowser() async {
+    final uri = Uri.base.resolve('assets/assets/resume.pdf');
+
+    if (!await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+      webOnlyWindowName: '_blank',
+    )) {
+      debugPrint('Could not open resume: $uri');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-      backgroundColor: Color(0xFF07111F),
-      body: SfPdfViewer.asset(
-        'assets/resume.pdf',
+    if (kIsWeb) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF080B1A),
+        appBar: AppBar(
+          title: const Text('My Resume'),
+          backgroundColor: const Color(0xFF15152C),
+        ),
+        body: Center(
+          child: ElevatedButton.icon(
+            onPressed: _openResumeInBrowser,
+            icon: const Icon(Icons.open_in_new),
+            label: const Text('Open Resume PDF'),
+          ),
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: const Color(0xFF080B1A),
+      appBar: AppBar(
+        title: const Text('My Resume'),
       ),
+      body: SfPdfViewer.asset('assets/resume.pdf'),
     );
   }
 }
-
 // ============================================================
 // CONTACT PAGE
 // ============================================================
@@ -1291,7 +1314,7 @@ class ContactPage extends StatelessWidget {
                 const Icon(
                   Icons.connect_without_contact_rounded,
                   size: 52,
-                  color: Color(0xFF00C8FF),
+                  color: Color(0xFFB99AFF),
                 ),
                 const SizedBox(height: 18),
                 const Text(
@@ -1356,7 +1379,7 @@ class ContactPage extends StatelessWidget {
         icon: Icon(icon, size: 18),
         label: Text(text),
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF00B8FF),
+          backgroundColor: const Color(0xFF8B5CF6),
           foregroundColor: Colors.black,
           elevation: 0,
           padding: const EdgeInsets.symmetric(
@@ -1377,7 +1400,7 @@ class ContactPage extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.white,
         side: const BorderSide(
-          color: Color(0x4400C8FF),
+          color: Color(0x448B5CF6),
         ),
         padding: const EdgeInsets.symmetric(
           horizontal: 20,
@@ -1476,12 +1499,12 @@ class InfoRow extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: const Color(0xFF00C8FF).withValues(alpha: 0.08),
+              color: const Color(0xFFB99AFF).withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFF00C8FF),
+              color: const Color(0xFFB99AFF),
               size: 21,
             ),
           ),
@@ -1549,8 +1572,8 @@ class ExperienceCard extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   colors: [
-                    Color(0xFF00B8FF),
-                    Color(0xFF1769FF),
+                    Color(0xFF8B5CF6),
+                    Color(0xFF5B36D1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(15),
@@ -1577,7 +1600,7 @@ class ExperienceCard extends StatelessWidget {
                   Text(
                     company,
                     style: const TextStyle(
-                      color: Color(0xFF00C8FF),
+                      color: Color(0xFFB99AFF),
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1660,8 +1683,8 @@ class ProjectCard extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
                       colors: [
-                        Color(0xFF00B8FF),
-                        Color(0xFF1769FF),
+                        Color(0xFF8B5CF6),
+                        Color(0xFF5B36D1),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(15),
@@ -1682,7 +1705,7 @@ class ProjectCard extends StatelessWidget {
             Text(
               project.subtitle.toUpperCase(),
               style: const TextStyle(
-                color: Color(0xFF00C8FF),
+                color: Color(0xFFB99AFF),
                 fontSize: 10,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
@@ -1725,9 +1748,9 @@ class ProjectCard extends StatelessWidget {
               ),
               label: const Text('View Details'),
               style: OutlinedButton.styleFrom(
-                foregroundColor: const Color(0xFF00C8FF),
+                foregroundColor: const Color(0xFFB99AFF),
                 side: const BorderSide(
-                  color: Color(0x6600C8FF),
+                  color: Color(0x668B5CF6),
                 ),
               ),
             ),
@@ -1746,7 +1769,7 @@ void _showProjectDialog(
     context: context,
     builder: (context) {
       return AlertDialog(
-        backgroundColor: const Color(0xFF101D2E),
+        backgroundColor: const Color(0xFF15152C),
         title: Text(project.title),
         content: SingleChildScrollView(
           child: Column(
@@ -1828,7 +1851,7 @@ class SkillCard extends StatelessWidget {
               Text(
                 '${(value * 100).round()}%',
                 style: const TextStyle(
-                  color: Color(0xFF00C8FF),
+                  color: Color(0xFFB99AFF),
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -1851,7 +1874,7 @@ class SkillCard extends StatelessWidget {
                   backgroundColor: Colors.white10,
                   valueColor:
                   const AlwaysStoppedAnimation<Color>(
-                    Color(0xFF00B8FF),
+                    Color(0xFF8B5CF6),
                   ),
                 ),
               );
@@ -1890,12 +1913,12 @@ class EducationCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: const Color(0xFF00C8FF).withValues(alpha: 0.08),
+                color: const Color(0xFFB99AFF).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(15),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF00C8FF),
+                color: const Color(0xFFB99AFF),
                 size: 28,
               ),
             ),
@@ -1915,7 +1938,7 @@ class EducationCard extends StatelessWidget {
                   Text(
                     institute,
                     style: const TextStyle(
-                      color: Color(0xFF00C8FF),
+                      color: Color(0xFFB99AFF),
                       height: 1.4,
                     ),
                   ),
@@ -1965,12 +1988,12 @@ class CertificationCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: const Color(0xFF00C8FF).withValues(alpha: 0.08),
+                color: const Color(0xFFB99AFF).withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF00C8FF),
+                color: const Color(0xFFB99AFF),
                 size: 27,
               ),
             ),
@@ -1990,7 +2013,7 @@ class CertificationCard extends StatelessWidget {
                   Text(
                     organization,
                     style: const TextStyle(
-                      color: Color(0xFF00C8FF),
+                      color: Color(0xFFB99AFF),
                     ),
                   ),
                   const SizedBox(height: 5),
@@ -2069,10 +2092,10 @@ Widget _glassCard({
     width: double.infinity,
     padding: padding,
     decoration: BoxDecoration(
-      color: const Color(0xFF101D2E).withValues(alpha: 0.82),
+      color: const Color(0xFF15152C).withValues(alpha: 0.82),
       borderRadius: BorderRadius.circular(22),
       border: Border.all(
-        color: const Color(0x2200C8FF),
+        color: const Color(0x228B5CF6),
       ),
       boxShadow: [
         BoxShadow(
@@ -2132,7 +2155,7 @@ class BackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF00B8FF).withValues(alpha: 0.035)
+      ..color = const Color(0xFF8B5CF6).withValues(alpha: 0.035)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(
